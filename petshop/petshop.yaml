@@ -1,0 +1,218 @@
+---
+- config:
+    PETSHOP_URI: http://localhost/petshop
+    SECURITY_SERVICE_URL: 'http://localhost'
+    USER_PROFILE_ID: '12345'
+#############################################################
+- beforeAll: sessionId
+  url: ${SECURITY_SERVICE_URL}/startSession
+  method: GET
+  options:
+    qs:
+      userProfileId: ${USER_PROFILE_ID}
+  asserts:
+    status: 200
+- beforeAll: defaultStatus
+  script: >
+    'sold'
+#############################################################
+- beforeEach: requestToken
+  url: ${SECURITY_SERVICE_URL}/createJWTToken
+  method: GET
+  options:
+    qs:
+      sessionId: ${beforeAll['sessionId'].body}
+  asserts:
+    status: 200
+  script: >
+    // console.debug('Before Each - requestToken');
+    // console.debug(`USER: ${process.env.USER}`);
+    // console.debug(`SessionId: ${beforeAll['sessionId'].body}`);
+#############################################################    
+- afterEach: releaseToken
+  script: >
+    // console.debug('After Each - releaseToken');
+#############################################################    
+- afterAll: closeSession
+  script: >
+    // console.debug('After All - closeSession');    
+#############################################################
+- test: get a pet
+  data:
+    url: ${PETSHOP_URI}/pet/1017
+    method: GET
+    options:
+      headers:
+        Accept: application/json
+        Authorization: Bearer ${beforeEach['requestToken'].body}
+  asserts:
+    status: 200
+    schema: petshop/pet
+    verifypath:
+      - path: $.id
+        expect: .to.deep.equal([1017])
+    responsetime: 10000
+#############################################################
+- test: find a pet by default status
+  data:
+    url: ${PETSHOP_URI}/pet/findByStatus?status=${beforeAll.defaultStatus}
+    method: GET
+    options:
+      headers:
+        Accept: application/json
+  asserts:
+    status: 200
+    responsetime: 10000
+#############################################################
+- test: compare a pet with file
+  before:
+    - id: read file
+      script: >
+        const fs = require('fs');
+        fs.readFileSync(`${fileDir}/data.json`, 'utf8')
+  data:
+    url: ${PETSHOP_URI}/pet/1017
+    method: GET
+    options:
+      headers:
+        Accept: application/json
+        Authorization: Bearer ${beforeEach['requestToken'].body}
+  asserts:
+    status: 200
+    schema: petshop/pet
+    verifypath:
+      - path: $
+        expect: .to.deep.equal([JSON.parse(before['read file'])])
+    responsetime: 10000
+#############################################################
+- test: create a pet
+  data:
+    url: ${PETSHOP_URI}/pet/1017
+    method: POST
+    options:
+      headers:
+        Accept: application/json
+      json:
+        category:
+          id: 1016,
+          name: string
+        name: Mell
+        tags:
+          - golden
+  asserts:
+    status:
+      - 200
+      - 409
+    responsetime: 10000
+#############################################################
+- test: create and update a pet
+  before:
+    - id: Create a Pet
+      url: ${PETSHOP_URI}/pet
+      method: POST
+      options:
+        headers:
+          Accept: application/json
+        json:
+          category:
+            id: 1016,
+            name: string
+          name: Mell
+          tags:
+            - golden
+      asserts:
+        status: 201
+    - id: Get a Pet
+      url: "${before['Create a Pet'].response.headers.location}"
+      method: GET
+      options:
+        headers:
+          Accept: application/json
+      asserts:
+        status: 200
+        schema: petshop/pet
+        verifypath:
+          - path: $.tags[?(@.name == 'golden')]
+  data:
+    url: ${PETSHOP_URI}/pet/${before['Get a Pet'].body.id}
+    method: PUT
+    options:
+      headers:
+        Accept: application/json
+      json:
+        category:
+          id: 1016,
+          name: string
+        name: Mel
+  asserts:
+    status: 200
+    schema: petshop/pet
+    verifypath:
+      - path: $.id
+        expect: .to.deep.equal([1017])
+    responsetime: 10000
+    script: >
+          chai.expect(r.body.photoUrls, "Wrong photo urls")
+            .to.deep.equal([
+            "url1",
+            "url2"
+          ]);
+  after:
+    - url: ${PETSHOP_URI}/pet/${before['Get a Pet'].body.id}
+      method: DELETE
+      options:
+        headers:
+          Accept: application/json
+      asserts:
+        status: 200
+    - url: ${PETSHOP_URI}/pet/${before['Get a Pet'].body.id}
+      method: GET
+      options:
+        headers:
+          Accept: application/json
+      asserts:
+        status: 404
+#############################################################
+- schema: petshop/pet
+  type: object
+  properties:
+    id:
+      type: integer
+    name:
+      type: string
+    category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+        - id
+        - name
+    photoUrls:
+      type: array
+      items:
+        type: string
+    tags:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+        required:
+          - id
+          - name
+    status:
+      type: string
+      enum:
+        - available
+        - pending
+        - sold
+  required:
+    - id
+    - category
+    - name

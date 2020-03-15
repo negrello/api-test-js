@@ -1,0 +1,19 @@
+{
+    "id": 1017,
+    "category": {
+        "id": 1016,
+        "name": "string"
+    },
+    "name": "Max",
+    "photoUrls": [
+        "url1",
+        "url2"
+    ],
+    "tags": [
+        {
+            "id": 0,
+            "name": "golden"
+        }
+    ],
+    "status": "available"
+}

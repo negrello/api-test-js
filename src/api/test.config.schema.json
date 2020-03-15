@@ -1,0 +1,168 @@
+{
+  "type": "object",
+  "properties": {
+    "only": {
+      "type": "boolean"
+    },
+    "onlyall": {
+      "type": "boolean"
+    },
+    "skipall": {
+      "type": "boolean"
+    },
+    "test": {
+      "type": "string"
+    },
+    "handler": {
+      "type": "string"
+    },
+    "before": {
+      "type": ["array", "object"],
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "options": {
+          "type": "object"
+        },
+        "status": {
+          "type": ["array", "number"]
+        }
+      },
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object"
+          },
+          "status": {
+            "type": ["array", "number"]
+          }
+        },
+        "anyOf": [
+          {"required": ["url"]},
+          {"required": ["script"]}
+        ]
+      },
+      "anyOf": [
+        {"required": ["url"]},
+        {"required": ["script"]}
+      ],
+      "additionalProperties": false
+    },
+    "after": {
+      "type": ["array", "object"],
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "options": {
+          "type": "object"
+        },
+        "status": {
+          "type": ["array", "number"]
+        }
+      },
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object"
+          },
+          "status": {
+            "type": ["array", "number"]
+          }
+        },
+        "required": ["url"]
+      },
+      "required": ["url"],
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "dependson": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "options": {
+          "type": "object"
+        }
+      },
+      "required": ["url"],
+      "additionalProperties": false
+    },
+    "asserts": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object"
+        },
+        "body": {
+          "type": "array"
+        },
+        "verifypath": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type":"string",
+                "pattern": "^\\$.*$"
+              },
+              "expect": {
+                "type":"string",
+                "pattern": "^\\..*$"
+              }
+            },
+            "required": ["path"]
+          }
+        },
+        "has-json": {
+          "type": "array"
+        },
+        "has-not-json": {
+          "type": "array"
+        },
+        "status": {
+          "type": ["array", "number"]
+        },
+        "responsetime": {
+          "type": "number"
+        },
+        "script": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["data"],
+  "additionalProperties": false
+}

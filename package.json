@@ -1,0 +1,81 @@
+{
+  "name": "api-test",
+  "version": "1.0.0",
+  "description": "Engine para testes de API",
+  "main": "src/index.js",
+  "contributors": [
+    {
+      "name": "Fabio Negrello",
+      "email": "fabio.negrello@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "babel-cli": "6.24.1",
+    "babel-core": "6.25.0",
+    "babel-eslint": "7.2.3",
+    "babel-plugin-rewire": "1.1.0",
+    "babel-plugin-transform-async-to-generator": "6.24.1",
+    "babel-polyfill": "6.23.0",
+    "babel-preset-es2015": "6.24.1",
+    "babel-preset-es2016": "6.24.1",
+    "babel-preset-es2017": "6.24.1",
+    "babel-preset-stage-2": "6.24.1",
+    "chai": "4.1.0",
+    "chakram": "^1.5.0",
+    "clone-deep": "1.0.0",
+    "common-errors": "1.0.2",
+    "dotenv": "4.0.0",
+    "eslint": "4.3.0",
+    "js-yaml": "^3.10.0",
+    "jsonpath": "^1.0.0",
+    "jsonwebtoken": "7.4.1",
+    "mem": "1.1.0",
+    "minimist": "^1.2.0",
+    "mocha": "3.4.2",
+    "mochawesome": "^3.0.2",
+    "nock": "^9.4.3",
+    "nodemon": "1.11.0",
+    "npm-check-updates": "2.12.1",
+    "pino": "^4.17.5",
+    "ramda": "0.24.1",
+    "require-from-string": "^2.0.1",
+    "restify": "5.0.1",
+    "restify-cookies": "0.2.2",
+    "superagent": "3.5.2",
+    "tv4": "^1.3.0"
+  },
+  "scripts": {
+    "ut": "NODE_ENV=test NODE_PATH=src SECURITY_SERVICE_URL=http://localhost mocha './src/**/*.spec.js' --timeout 30000 --require babel-core/register",
+    "ut-debug": "NODE_ENV=test NODE_PATH=src SECURITY_SERVICE_URL=http://localhost mocha './src/**/*.spec.js' --inspect-brk=5858 --timeout 30000 --require babel-core/register",
+    "nodemon-ut": "NODE_ENV=test NODE_PATH=src SECURITY_SERVICE_URL=http://localhost nodemon --delay 2 -watch './src/*' -watch './src/**/*.spec.js' -watch './petshop/petshop.yaml' --exec \"mocha './src/**/*.spec.js' --timeout 30000 --require babel-core/register || true\"",
+    "test": "NODE_ENV=test NODE_PATH=src ./node_modules/.bin/mocha './src/api/scanner.js' --reporter mochawesome --require babel-core/register",
+    "nodemon-test": "NODE_ENV=test NODE_PATH=src ./node_modules/.bin/nodemon --exec \"./node_modules/.bin/mocha './src/api/scanner.js' --reporter mochawesome --require babel-core/register || true\"",
+
+    "build:js": "simplifyify --outfile dist/chakram.js --bundle --minify --debug --standalone chakram lib/* lib/**/*",
+    "doc": "jsdoc -t node_modules/jaguarjs-jsdoc -c conf.json -R README.md -r lib",
+    "prebuild:js": "rm -rf dist",
+    "predoc": "npm install",
+    "pretest": "npm install"
+  },
+  "engines": {
+    "node": ">=6.10",
+    "npm": ">=3.10"
+  },
+  "keywords": [
+    "test",
+    "API",
+    "REST",
+    "HTTP",
+    "YML",
+    "JSON",
+    "BDD"
+  ],
+  "license": "MIT",
+  "nodemonConfig": {
+    "ignore": [
+      "docker/*",
+      "mochawesome/*"
+    ],
+    "delay": "1000"
+  }
+}
