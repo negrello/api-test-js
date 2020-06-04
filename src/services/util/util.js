@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import logger from 'setup/logger';
-import chakram from 'chakram';
 import chai from 'chai'
 
 const expect = chai.expect;

@@ -18,11 +18,29 @@ const verifyStatus = (r, assertMsgPrefix, status) => {
   }
 };
 
-const verifySchema = (data, schema, assertMsgPrefix) => {
+const verifySchema = (data, schema, assertMsgPrefix, schemas, isTest) => {
+  Object.entries(schemas)
+    .forEach(([schemaName, s]) => {
+      let schemaClone = Object. assign({}, s);
+      delete schemaClone['schema'];
+      tv4.addSchema(schemaName, schemaClone);
+  });
+
+  if (typeof schema == 'object' && schema.type === 'string') {
+    if (!data) {
+      chai.assert(
+        false,
+        composeErrorMessage()
+      );
+    } else {
+      return;
+    }
+  }
+
   const result = tv4.validateMultiple(data, schema, false, false);
 
   const composeErrorMessage = function () {
-    var errorMsg = assertMsgPrefix + ': expected JSON to match schema ' +
+    var errorMsg = assertMsgPrefix + ': expected ' + (isTest ? 'TEST ' : '') + 'JSON to match schema ' +
       JSON.stringify(schema, null, 2) + '.';
 
     if (result.missing.length > 0) {
@@ -139,7 +157,7 @@ const verifyResult = async (mainScope, r, test, assertMsgPrefix, evalFunc,
       expect(schema,
         `Schema ${test.asserts.schema}`)
         .to.exist;
-      verifySchema(r.body, schema, assertMsgPrefix);
+      verifySchema(r.body, schema, assertMsgPrefix, schemas, false);
     }
 
     if (test.asserts.headers) {

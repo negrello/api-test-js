@@ -1,11 +1,14 @@
 # Api-test-js
 
-Api-test-js is a data-driven-test framework designed to perform tests on HTTP endpoints, specially with JSON, Text or XML content-type. You can use this framework to define integration tests across different micro-services in a common format that can be understood by devs and testers.
+Api-test-js is a data-driven-test framework designed to perform tests on REST endpoints, specially with JSON or Text Content-Type. You can use this framework to define integration tests across different micro-services in a common format that can be understood by devs and testers.
+
+Although you can write your test definitions manually, sample test definitions can be generated directly from your Swagger documentation.
 
 More advanced tests can be performed by using node.JS scripts embedded directly in the test definitions.
 
-It can be run directly through npm command by providing test scenarios in json or yaml formats.
+It can be run directly through npm command by providing test scenarios in json or yaml (or yml) formats.
 
+The results and details of the API tests are presented in an HTML report for easy verification.
 
 ## Test scenarios
 
@@ -123,7 +126,7 @@ One test scenario can reference before, beforeAll, after and afterAll fragments 
     responsetime: 10000
 ```
 
-You can take a look at other scenarios in [petshop/petshop.yaml](./petshop/petshop.yaml). This file is used in our unit tests.
+You can take a look at other scenarios in [petshop/petshop.yaml](https://github.com/negrello/api-test-js/petshop/petshop.yaml). This file is used in our unit tests.
 
 ### _Asserts_:
 
@@ -134,31 +137,50 @@ These assertions are supported in the _asserts_ fragment: _body_, _has-json_, _h
 - body is an array of regular expressions that are tested against the response body (string).
 - _has-json_ and _has-not-json_ verify whether the specified paths exist in the response json.
 
-## Installation
+## Generating test scenarios from Swagger Documentation
 
-Install _nvm_ (https://github.com/creationix/nvm#install-script), and run the following commands in the root directory:
+Documenting your APIs with swagger is a good practice, and it can be accomplished by using tools such as Springfox (for Spring users) or express-swagger-generator for node users, among others.
+
+You can generate sample test scenarios by using the _gen_ command. It will scan the swagger documentation and generate a test for each combination of path + method. It will also automatically add a sample payload based on the method parameters, and a _schema_ assert based on the response schema.
+For each _tag_ defined by the API, a file will be created containing all paths/methods with that tag.
 
 ```sh
-nvm install
-nvm use
-npm install
+> npm run gen -- --file=https://petstore.swagger.io/v2/swagger.json
+
+Generating test descriptors generated at ./Swagger Petstore/pet.yaml
+Generating test descriptors generated at ./Swagger Petstore/store.yaml
+Generating test descriptors generated at ./Swagger Petstore/user.yaml
+```
+
+The _file_ argument must point to the json containing the swagger documentation of your service. It can be an URL or a local file.
+
+You can specify the output directory with _outDir_ argument:
+
+```sh
+LOG_LEVEL=debug npm run gen -- --file=http://automotive-query-service:8080/v2/api-docs --outDir=/home/negrello/tmp/pet-shot-swagger
 ```
 
 ## Running tests
 
-Running all test in a test file:
+Running all tests in a test file or directory:
 
 ```sh
-npm run test -- --ddt=<ddt_file>
+npm run test -- --ddt=<ddt_file_or_directory>
 ```
 
 Running a single scenario in a test file:
 
 ```sh
-npm run test -- --test='integration-tests/user-crud.yaml' --testcase='POST - Success'
+npm run test -- --ddt=<ddt_file> --test='integration-tests/user-crud.yaml' --testcase='POST - Success'
 ```
 
-Parameter --testcase can be specified more than once in the same command.
+Running with log level DEBUG:
+
+```sh
+LOG_LEVEL=debug npm run test -- --ddt='Swagger\ Petstore/pet.yaml' --testcase='Add a new pet to the store'
+```
+
+The --testcase argument can be specified more than once in the same command.
 You can add _'only': true_ to a test scenario to force the execution of this test only.
 
 ## Report
