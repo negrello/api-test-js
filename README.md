@@ -126,7 +126,7 @@ One test scenario can reference before, beforeAll, after and afterAll fragments 
     responsetime: 10000
 ```
 
-You can take a look at other scenarios in [petshop/petshop.yaml](https://github.com/negrello/api-test-js/petshop/petshop.yaml). This file is used in our unit tests.
+You can take a look at other scenarios in [petshop/petshop.yaml](https://github.com/negrello/api-test-js/blob/master/petshop/petshop.yaml). This file is used in our unit tests.
 
 ### _Asserts_:
 
