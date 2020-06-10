@@ -145,7 +145,7 @@ You can generate sample test scenarios by using the _gen_ command. It will scan 
 For each _tag_ defined by the API, a file will be created containing all paths/methods with that tag.
 
 ```sh
-> npx gen-test --file=https://petstore.swagger.io/v2/swagger.json
+> npx api-test-js gen-test --file=https://petstore.swagger.io/v2/swagger.json
 
 Generating test descriptors generated at ./Swagger Petstore/pet.yaml
 Generating test descriptors generated at ./Swagger Petstore/store.yaml
@@ -157,7 +157,7 @@ The _file_ argument must point to the json containing the swagger documentation 
 You can specify the output directory with _outDir_ argument:
 
 ```sh
-LOG_LEVEL=debug npx gen-test --file=http://automotive-query-service:8080/v2/api-docs --outDir=/home/negrello/tmp/pet-shot-swagger
+LOG_LEVEL=debug npx api-test-js gen-test --file=http://automotive-query-service:8080/v2/api-docs --outDir=/home/negrello/tmp/pet-shot-swagger
 ```
 
 ## Running tests
@@ -165,19 +165,19 @@ LOG_LEVEL=debug npx gen-test --file=http://automotive-query-service:8080/v2/api-
 Running all tests in a test file or directory:
 
 ```sh
-npx api-test --ddt=<ddt_file_or_directory>
+npx api-test-js api-test --ddt=<ddt_file_or_directory>
 ```
 
 Running a single scenario in a test file:
 
 ```sh
-npx api-test --ddt=<ddt_file> --test='integration-tests/user-crud.yaml' --testcase='POST - Success'
+npx api-test-js api-test --ddt=<ddt_file> --test='integration-tests/user-crud.yaml' --testcase='POST - Success'
 ```
 
 Running with log level DEBUG:
 
 ```sh
-LOG_LEVEL=debug npx api-test --ddt='Swagger\ Petstore/pet.yaml' --testcase='Add a new pet to the store'
+LOG_LEVEL=debug npx api-test-js api-test --ddt='Swagger\ Petstore/pet.yaml' --testcase='Add a new pet to the store'
 ```
 
 The --testcase argument can be specified more than once in the same command.
