@@ -1,5 +1,4 @@
 import pino from 'pino';
-import pkginfo from 'setup/pkginfo';
 
 const level = process.env.LOG_LEVEL || 'info';
 

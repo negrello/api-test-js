@@ -1,12 +1,13 @@
 import 'babel-core/register';
 import 'babel-polyfill';
 
-import 'setup/env';
-import logger from 'setup/logger';
+import logger from '../setup/logger';
 import SwaggerParser from 'swagger-parser';
 import * as json2yml from 'json2yaml';
 import jsf from 'json-schema-faker';
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 const argv = require('minimist')(process.argv.slice(2));
 const BLOCK_SEPARATOR = '###############################################################';
@@ -192,13 +193,14 @@ async function gen(file) {
             blocks.push(schema);
         })
 
-        let dir = argv.outDir || './' + api.info.title;
+        let dir = argv.outDir || path.join('./', api.info.title);
+        dir = dir.replace("~", os.homedir);
 
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
         }
 
-        const filePath = dir + '/' + tag.name + '.yaml';
+        const filePath = path.join(dir, tag.name + '.yaml');
         console.log(`Generating test descriptors generated at ${filePath}`);
         let stream = fs.createWriteStream(filePath);
 
@@ -218,8 +220,10 @@ async function gen(file) {
     });
 }
 
+
+
 if (argv.file) {
-    gen(argv.file).catch(err => {
+    gen(argv.file.replace("~", os.homedir)).catch(err => {
         console.error(err.message || err);
         process.exit(1);
     });

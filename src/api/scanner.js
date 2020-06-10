@@ -1,6 +1,3 @@
-import 'babel-core/register';
-import 'babel-polyfill';
-import 'babel-polyfill';
 import chai from 'chai';
 import path from 'path'
 import fs from 'fs';
@@ -618,14 +615,15 @@ if (global.__testfile) {
   const basedir = path.resolve(__dirname, '../../');
 
   if (argv.ddt) {
-    if (!fs.existsSync(argv.ddt)) {
-      logger.error(`File or directory does not exist: ${argv.ddt}`);
+    const ddt = path.resolve(argv.ddt);
+
+    if (!fs.existsSync(ddt)) {
+      logger.error(`File or directory does not exist: ${ddt}`);
       process.exit(1);
     }
 
-    const ddt = path.resolve(basedir, argv.ddt);
 
-    if (fs.lstatSync(argv.ddt).isDirectory()) {
+    if (fs.lstatSync(ddt).isDirectory()) {
       walkSync(ddt, (file => {
         createSpec({
           testfile: file,
@@ -633,9 +631,8 @@ if (global.__testfile) {
         });
       }));
     } else {
-      const ddtFile = path.resolve(basedir, argv.ddt);
       createSpec({
-        testfile: ddtFile,
+        testfile: ddt,
         testcaseFilter: argv.testcase
       });
     }

@@ -27,7 +27,7 @@
     "js-yaml": "^3.10.0",
     "json-schema-faker": "^0.5.0-rc23",
     "json2yaml": "^1.1.0",
-    "jsonpath": "^1.0.0",
+    "jsonpath": "^1.0.2",
     "mem": "1.1.0",
     "minimist": "^1.2.0",
     "mocha": "3.4.2",
@@ -43,13 +43,19 @@
   },
   "scripts": {
     "ut": "NODE_ENV=test NODE_PATH=src SECURITY_SERVICE_URL=http://localhost mocha './src/**/*.spec.js' --timeout 30000 --require babel-core/register",
-    "gen": "NODE_ENV=test NODE_PATH=src node ./node_modules/babel-cli/bin/babel-node.js './src/swagger.js'",
+    "gen": "NODE_ENV=test NODE_PATH=src node ./node_modules/babel-cli/bin/babel-node.js './src/api/swagger.js'",
     "nodemon-gen": "NODE_ENV=test NODE_PATH=src nodemon --delay 2 -watch './src/*' --exec \"node ./node_modules/babel-cli/bin/babel-node.js './src/swagger.js' --timeout 30000 --require babel-core/register || true\"",
     "ut-debug": "NODE_ENV=test NODE_PATH=src SECURITY_SERVICE_URL=http://localhost mocha './src/**/*.spec.js' --inspect-brk=5858 --timeout 30000 --require babel-core/register",
     "nodemon-ut": "NODE_ENV=test NODE_PATH=src SECURITY_SERVICE_URL=http://localhost nodemon --delay 2 -watch './src/*' -watch './src/**/*.spec.js' -watch './petshop/petshop.yaml' --exec \"mocha './src/**/*.spec.js' --timeout 30000 --require babel-core/register || true\"",
     "test": "NODE_ENV=test NODE_PATH=src ./node_modules/.bin/mocha './src/api/scanner.js' --reporter mochawesome --require babel-core/register",
     "nodemon-test": "NODE_ENV=test NODE_PATH=src ./node_modules/.bin/nodemon --exec \"./node_modules/.bin/mocha './src/api/scanner.js' --reporter mochawesome --require babel-core/register || true\"",
-    "pretest": "npm install"
+    "pretest": "npm install",
+    "clean": "rm -rf build && mkdir build",
+    "build": "npx babel -d ./build ./src -s --copy-files"
+  },
+  "bin": {
+    "api-test": "./bin/api-test.js",
+    "gen-test": "./bin/gen-test.js"
   },
   "engines": {
     "node": ">=6.10",
