@@ -1,6 +1,3 @@
-import 'babel-core/register';
-import 'babel-polyfill';
-
 import logger from '../setup/logger';
 import SwaggerParser from 'swagger-parser';
 import * as json2yml from 'json2yaml';
@@ -192,6 +189,16 @@ async function gen(file) {
 
             blocks.push(schema);
         })
+
+        if (argv.tag) {
+            let tagFilter = argv.tag;
+            if (!tagFilter.forEach) {
+                tagFilter = [tagFilter];
+            }
+            if (!tagFilter.includes(tag.name)) {
+                return;
+            }
+        }
 
         let dir = argv.outDir || path.join('./', api.info.title);
         dir = dir.replace("~", os.homedir);

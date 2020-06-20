@@ -18,6 +18,7 @@ import {
   verifySchema
 } from 'services/util/validation';
 
+global.regeneratorRuntime = require('regenerator-runtime');
 global.__basedir = path.resolve(__dirname, '../../');
 
 const jp = jsonpath;
@@ -614,17 +615,17 @@ if (global.__testfile) {
 } else {
   const basedir = path.resolve(__dirname, '../../');
 
-  if (argv.ddt) {
-    const ddt = path.resolve(argv.ddt);
+  if (argv.file) {
+    const file = path.resolve(argv.file);
 
-    if (!fs.existsSync(ddt)) {
-      logger.error(`File or directory does not exist: ${ddt}`);
+    if (!fs.existsSync(file)) {
+      logger.error(`File or directory does not exist: ${file}`);
       process.exit(1);
     }
 
 
-    if (fs.lstatSync(ddt).isDirectory()) {
-      walkSync(ddt, (file => {
+    if (fs.lstatSync(file).isDirectory()) {
+      walkSync(file, (file => {
         createSpec({
           testfile: file,
           testcaseFilter: argv.testcase
@@ -632,12 +633,12 @@ if (global.__testfile) {
       }));
     } else {
       createSpec({
-        testfile: ddt,
+        testfile: file,
         testcaseFilter: argv.testcase
       });
     }
   } else {
-    logger.error('Parameter ddt is required.');
+    logger.error('Parameter file is required.');
     process.exit(1);
   }
 }

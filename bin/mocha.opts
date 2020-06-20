@@ -1,2 +1,0 @@
-  --reporter mochawesome
-  --require babel-core/register

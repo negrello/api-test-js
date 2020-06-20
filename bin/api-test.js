@@ -17,7 +17,6 @@ if (!fs.existsSync(mocha)) {
 
 const proc = spawn(mocha, [
     path.join(__dirname, '../build/api/scanner.js'),
-    '--require', 'babel-polyfill',
     '--reporter', 'mochawesome',
     '--reporter-options', 'reportDir=api-report,reportFilename=report',
     ...argv.slice(2)],

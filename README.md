@@ -137,6 +137,27 @@ These assertions are supported in the _asserts_ fragment: _body_, _has-json_, _h
 - body is an array of regular expressions that are tested against the response body (string).
 - _has-json_ and _has-not-json_ verify whether the specified paths exist in the response json.
 
+## Installation
+
+Installing api-test-js in current directory:
+
+```sh
+npm install api-test-js
+```
+
+You can use the binaries directly (./node_modules/api-test-js/bin/api-test.js) or through _npm-run_ (recommended). 
+In this case, you also need to install npm-run globally:
+
+```sh
+sudo npm install -g npm-run
+```
+
+If you with to install api-test-js globally, some additional flags are required due to third-party restrictions:
+
+```sh
+sudo npm install -g --unsafe-perm=true --allow-root api-test-js
+```
+
 ## Generating test scenarios from Swagger Documentation
 
 Documenting your APIs with swagger is a good practice, and it can be accomplished by using tools such as Springfox (for Spring users) or express-swagger-generator for node users, among others.
@@ -145,7 +166,7 @@ You can generate sample test scenarios by using the _gen_ command. It will scan 
 For each _tag_ defined by the API, a file will be created containing all paths/methods with that tag.
 
 ```sh
-> npx api-test-js gen-test --file=https://petstore.swagger.io/v2/swagger.json
+> npm-run gen-test --file=https://petstore.swagger.io/v2/swagger.json
 
 Generating test descriptors generated at ./Swagger Petstore/pet.yaml
 Generating test descriptors generated at ./Swagger Petstore/store.yaml
@@ -157,7 +178,7 @@ The _file_ argument must point to the json containing the swagger documentation 
 You can specify the output directory with _outDir_ argument:
 
 ```sh
-LOG_LEVEL=debug npx api-test-js gen-test --file=http://automotive-query-service:8080/v2/api-docs --outDir=/home/negrello/tmp/pet-shot-swagger
+LOG_LEVEL=debug npm-run gen-test --file=http://automotive-query-service:8080/v2/api-docs --outDir=/home/negrello/tmp/pet-shot-swagger
 ```
 
 ## Running tests
@@ -165,23 +186,38 @@ LOG_LEVEL=debug npx api-test-js gen-test --file=http://automotive-query-service:
 Running all tests in a test file or directory:
 
 ```sh
-npx api-test-js api-test --ddt=<ddt_file_or_directory>
+npm-run api-test --file=<file_or_directory>
 ```
 
 Running a single scenario in a test file:
 
 ```sh
-npx api-test-js api-test --ddt=<ddt_file> --test='integration-tests/user-crud.yaml' --testcase='POST - Success'
+npm-run api-test --file=<file> --test='integration-tests/user-crud.yaml' --testcase='POST - Success'
 ```
 
 Running with log level DEBUG:
 
 ```sh
-LOG_LEVEL=debug npx api-test-js api-test --ddt='Swagger\ Petstore/pet.yaml' --testcase='Add a new pet to the store'
+LOG_LEVEL=debug npm-run api-test --file='Swagger\ Petstore/pet.yaml' --testcase='Add a new pet to the store'
 ```
 
 The --testcase argument can be specified more than once in the same command.
 You can add _'only': true_ to a test scenario to force the execution of this test only.
+
+You can call the binary directly without using npm-run:
+
+```sh
+./node_modules/api-test-js/bin/api-test.js --file pet.yaml
+```
+
+You can use _npx_ to run the tests. In this case, no installation is necessary but the commands may take longer to start running.
+
+```sh
+npx api-test-js api-test --file=<file_or_directory>
+```
+
+I recommend using npn-run, which is faster for a local installation.
+
 
 ## Report
 

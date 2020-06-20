@@ -5,6 +5,7 @@
     "es2017",
     "stage-2"],
   "plugins": [
-    "transform-async-to-generator"
+    "transform-async-to-generator",
+    "babel-plugin-transform-runtime"
   ]
 }

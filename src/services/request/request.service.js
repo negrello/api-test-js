@@ -1,4 +1,5 @@
 import request from 'request';
+require("regenerator-runtime/runtime");
 
 async function makeRequest(method, url, options) {
   options.headers = options.headers || {};
