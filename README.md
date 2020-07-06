@@ -1,3 +1,6 @@
+
+<meta name="google-site-verification" content="d4XE3GwYE5ZNouXspM29G4GXXL-9Y8Dm5pK8IN5TRzI" />
+
 # Api-test-js
 
 Api-test-js is a data-driven-test framework designed to perform tests on REST endpoints, specially with JSON or Text Content-Type. You can use this framework to define integration tests across different micro-services in a common format that can be understood by devs and testers.
