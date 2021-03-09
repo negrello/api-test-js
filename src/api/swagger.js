@@ -12,11 +12,18 @@ const BLOCK_SEPARATOR = '#######################################################
 jsf.option({
     'alwaysFakeOptionals': true,
     'useExamplesValue': true,
-    'useDefaultValue': true
+    'useDefaultValue': true,
+    'failOnInvalidTypes': false,
+    'reuseProperties': true,
+    'fillProperties': true,
+    'replaceEmptyByRandomValue': true,
+    'refDepthMax': 2
 });
 
+jsf.extend('faker', () => require('faker'));
+
 function normalizeRefs(s) {
-    return JSON.parse(JSON.stringify(s).replace(/#\/definitions\//g, ''));
+    return JSON.parse(JSON.stringify(s).replace(/#\/definitions\//g, '').replace(/#\/components\/schemas\//g, ''));
 }
 
 function findVal(obj, key) {
@@ -73,7 +80,7 @@ async function gen(file) {
     const refs = [];
     let api = await SwaggerParser.parse(file);
 
-    Object.entries(api.definitions)
+    Object.entries(api.definitions || (api.components && api.components.schemas) || {})
         .forEach(([schemaName, s]) => {
             let normalized = normalizeRefs(s);
             schemas[`${schemaName}`] = normalized;
@@ -82,8 +89,14 @@ async function gen(file) {
 
     let configBlock = {
         config: {
-            SERVICE_URL: `${(api.schemes && api.schemes[0]) || 'http'}://${api.host}${api.basePath.replace(/\/$/, '')}`
+            SERVICE_URL: 'http://localhost:8080'
         }
+    }
+
+    if (api.host) {
+        configBlock.config.SERVICE_URL = `${(api.schemes && api.schemes[0]) || 'http'}://${api.host}${api.basePath.replace(/\/$/, '')}`;
+    } else if (api.servers) {
+        configBlock.config.SERVICE_URL = `${api.servers[0].url.replace(/\/$/, '')}`;
     }
 
     api.tags.forEach((tag, tagIndex) => {
@@ -96,7 +109,10 @@ async function gen(file) {
                 Object.keys(api.paths[path]).forEach((method, methodIndex) => {
                     const spec = api.paths[path][method];
                     if (!spec.tags.includes(tag.name)) {
-                        return
+                        return;
+                    }
+                    if (argv.uri && path.indexOf(argv.uri) == -1) {
+                        return;
                     }
                     let contentType = 'application/json';
 
@@ -150,7 +166,7 @@ async function gen(file) {
                                     let schema = {};
 
                                     if (ref) {
-                                        let schemaName = parameter.schema['$ref'].replace('#/definitions/', '');
+                                        let schemaName = parameter.schema['$ref'].replace('#/definitions/', '').replace('#/components/schemas/', '');
                                         schema = schemas[schemaName];
                                     } else {
                                         schema = parameter.schema;
@@ -162,7 +178,7 @@ async function gen(file) {
                                     apiTest.data.options.body = sampleBody;
                                 }
                             } else if (parameter.in === 'path') {
-                                const sampleBody = jsf.generate({ type: parameter.type });
+                                const sampleBody = jsf.generate({ type: parameter.type || (parameter.schema && parameter.schema.type) });
                                 apiTest.data.parameters = apiTest.data.options.parameters || {};
                                 apiTest.data.parameters[parameter.name] = sampleBody;
                                 const re = new RegExp('\{' + parameter.name + '\}', "g");
@@ -174,6 +190,34 @@ async function gen(file) {
                                 }
                             }
                         });
+                    }
+
+                    if (spec.requestBody && spec.requestBody.content) {
+                        let bodySchema = spec.requestBody.content['application/json'] || Object.entries(spec.requestBody.content)[0];
+                        bodySchema = bodySchema.schema;
+                        if (bodySchema) {
+                            let ref = bodySchema['$ref'];
+                            let schema = {};
+
+                            if (ref) {
+                                let schemaName = bodySchema['$ref'].replace('#/definitions/', '').replace('#/components/schemas/', '');
+                                schema = schemas[schemaName];
+                            } else {
+                                schema = bodySchema;
+                                schema = normalizeRefs(schema);
+                            }
+                            apiTest.data.options.json = true;
+                            try {
+                                const sampleBody = jsf.generate(schema, refs);
+                                apiTest.data.options.body = sampleBody;
+                            } catch (error) {
+                                if (error.message.indexOf('Error: Prop') == -1) {
+                                    logger.error(error.message);
+                                } else {
+                                    logger.debug(error.message);
+                                }
+                            }
+                        }
                     }
 
                     blocks.push(apiTest);
@@ -231,7 +275,7 @@ async function gen(file) {
 
 if (argv.file) {
     gen(argv.file.replace("~", os.homedir)).catch(err => {
-        console.error(err.message || err);
+        console.error(err);
         process.exit(1);
     });
 } else {
