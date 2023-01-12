@@ -21,7 +21,7 @@
     "jsonpath": "^1.0.2",
     "mem": "1.1.0",
     "minimist": "^1.2.0",
-    "mocha": "3.4.2",
+    "mocha": "10.2.0",
     "mochawesome": "^3.0.2",
     "nock": "^9.4.3",
     "nodemon": "1.11.0",
